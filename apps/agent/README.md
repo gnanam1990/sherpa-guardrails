@@ -24,3 +24,7 @@ pnpm --filter sherpa-demo-agent start
 
 The live mode calls `requestSpend` through the TypeScript SDK. Over-limit
 payments return a typed rejection and move no funds.
+
+Before live mode, the operator should run `ConfigureDemo` and
+`FundSpendAccount` from `docs/DEPLOYMENT.md` so the demo counterparty is
+allowlisted and the account has enough test USDC for the approved spend.
