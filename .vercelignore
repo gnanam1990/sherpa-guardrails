@@ -1,0 +1,11 @@
+apps/api/dist
+apps/agent/dist
+apps/dashboard/dist
+packages/*/dist
+packages/contracts/cache
+packages/contracts/out
+packages/contracts/broadcast
+packages/contracts/lib
+event_resources
+coverage
+*.log

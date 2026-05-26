@@ -12,6 +12,7 @@
 - [x] API simulation surface
 - [ ] Arc Testnet deployment
 - [ ] Live demo transaction
+- [ ] Vercel preview URL
 
 ## Before Friday Final
 
@@ -22,6 +23,17 @@
 - [ ] README final polish
 - [ ] Public launch post
 - [ ] Submission form links
+
+## Required Live Demo Secrets
+
+The live Arc demo cannot be produced without:
+
+- `DEPLOYER_PRIVATE_KEY` with Arc Testnet gas/test USDC
+- `AGENT_PRIVATE_KEY`
+- `AGENT_ADDRESS`
+- `COUNTERPARTY_ADDRESS`
+- `ARC_TESTNET_RPC_URL`
+- `ARC_USDC_ADDRESS`
 
 ## Demo Recording Order
 

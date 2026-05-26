@@ -90,3 +90,22 @@ VITE_COUNTERPARTY_ADDRESS=0x... \
 VITE_FROM_BLOCK=44000000 \
 pnpm --filter sherpa-dashboard dev
 ```
+
+## Vercel Dashboard Preview
+
+The root `vercel.json` deploys only the dashboard app from the monorepo:
+
+```text
+Build command: pnpm --filter sherpa-dashboard build
+Output: apps/dashboard/dist
+```
+
+Without `VITE_SPEND_ACCOUNT_ADDRESS`, the dashboard runs in preview mode. After
+Arc deployment, add these Vercel environment variables and redeploy:
+
+```text
+VITE_ARC_TESTNET_RPC_URL=https://rpc.testnet.arc.network
+VITE_SPEND_ACCOUNT_ADDRESS=0x...
+VITE_COUNTERPARTY_ADDRESS=0x...
+VITE_FROM_BLOCK=...
+```

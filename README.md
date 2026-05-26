@@ -79,6 +79,16 @@ pnpm contracts:test
 pnpm --filter @sherpa/api dev
 ```
 
+## Preview Deploy
+
+The repository includes `vercel.json` for a dashboard-only preview deploy:
+
+```bash
+pnpm --filter sherpa-dashboard build
+```
+
+Vercel output directory: `apps/dashboard/dist`.
+
 ## Core Demo
 
 ```text
