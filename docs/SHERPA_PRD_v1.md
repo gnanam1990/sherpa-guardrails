@@ -48,12 +48,13 @@ operator controls.
 
 ## 4. Solution
 
-Sherpa has five product layers:
+Sherpa has six product layers:
 
 | Layer | What It Does | Current Implementation |
 | --- | --- | --- |
 | Contract | Enforces budget before settlement | `SpendAccount`, `SpendAccountFactory` |
 | SDK | Gives agents a drop-in spend client | `@sherpa/guardrails` |
+| Intent | Turns plain-English payment requests into guarded spend attempts | `@sherpa/intent` |
 | Policy API | Previews policy and simulations off-chain | `apps/api`, `@sherpa/policy` |
 | Integrations | Guards x402-style payment requirements | `@sherpa/x402` |
 | Dashboard | Shows budget, policy, audit trail, and risk | `apps/dashboard` on Vercel |
@@ -99,7 +100,8 @@ Operator creates a Sherpa spend account
 ```mermaid
 flowchart LR
   Operator["Operator"] -->|"deploys, funds, sets caps"| Contract["SpendAccount on Arc Testnet"]
-  Agent["AI Agent"] -->|"SDK spend request"| SDK["@sherpa/guardrails SDK"]
+  Agent["AI Agent"] -->|"plain-English payment intent"| Intent["@sherpa/intent"]
+  Intent -->|"parsed spend attempt"| SDK["@sherpa/guardrails SDK"]
   X402["x402 Payment Requirement"] -->|"pre-payment policy check"| X402Pkg["@sherpa/x402"]
   API["Sherpa API"] -->|"simulate / evaluate"| Policy["@sherpa/policy + audit + simulator"]
   SDK --> Contract
@@ -204,11 +206,12 @@ The agent needs to complete a task that requires paid API/tool access.
 
 ```text
 1. Receive task.
-2. Detect paid resource requirement.
-3. Ask Sherpa whether payment is allowed.
-4. If allowed, call spend and continue.
-5. If rejected, stop or choose cheaper/allowed route.
-6. Emit trace for dashboard/audit.
+2. Detect paid resource requirement or natural-language payment intent.
+3. Parse the intent into amount, counterparty, and action.
+4. Ask Sherpa whether payment is allowed.
+5. If allowed, call spend and continue.
+6. If rejected, stop or choose cheaper/allowed route.
+7. Emit trace for dashboard/audit.
 ```
 
 ### Demo Moment
@@ -284,6 +287,9 @@ The API supports previews, simulations, and integration checks.
 ```text
 GET  /health
 GET  /policy/demo
+POST /intent/parse
+POST /intent/evaluate
+POST /intent/demo
 POST /policy/evaluate
 POST /simulate/demo
 POST /simulate
@@ -357,6 +363,7 @@ Built:
 - dashboard preview
 - API
 - policy package
+- intent package
 - audit package
 - simulator package
 - x402 guardrails package

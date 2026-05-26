@@ -5,36 +5,17 @@ import {
   type HexAddress,
   type SpendResult,
 } from "@sherpa/guardrails";
+import {
+  demoPaymentIntents,
+  parsePaymentIntent,
+  runIntentFlow,
+} from "@sherpa/intent";
+import { createDemoPolicy } from "@sherpa/policy";
 import { isAddress } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
-type DemoStep = {
-  label: string;
-  counterparty: HexAddress;
-  amountUsdc: string;
-  action: string;
-  expected: "approved" | "rejected";
-};
-
 const SAMPLE_COUNTERPARTY =
   "0x000000000000000000000000000000000000dEaD" as HexAddress;
-
-const demoSteps: DemoStep[] = [
-  {
-    label: "Allowed x402-style API payment",
-    counterparty: SAMPLE_COUNTERPARTY,
-    amountUsdc: "8",
-    action: "api_call",
-    expected: "approved",
-  },
-  {
-    label: "Deliberate overrun attempt",
-    counterparty: SAMPLE_COUNTERPARTY,
-    amountUsdc: "60",
-    action: "api_call",
-    expected: "rejected",
-  },
-];
 
 async function main() {
   const dryRun = process.argv.includes("--dry-run") || !process.env.AGENT_PRIVATE_KEY;
@@ -67,11 +48,23 @@ async function main() {
   console.log(`  remaining today:  ${formatUsdc(state.remainingDailyCap)} USDC`);
   console.log("");
 
-  for (const step of demoSteps) {
-    const request = { ...step, counterparty };
-    console.log(`Attempt: ${step.label}`);
-    console.log(`  amount: ${step.amountUsdc} USDC`);
-    console.log(`  counterparty: ${request.counterparty}`);
+  for (const input of demoPaymentIntents.slice(0, 2)) {
+    const intent = parsePaymentIntent(input);
+
+    const request = {
+      counterparty:
+        intent.counterparty === SAMPLE_COUNTERPARTY
+          ? counterparty
+          : intent.counterparty,
+      amountUsdc: intent.amountUsdc,
+      action: intent.action,
+    };
+
+    console.log(`Intent: ${intent.input}`);
+    console.log(`  parsed amount: ${intent.amountUsdc} USDC`);
+    console.log(`  parsed counterparty: ${intent.counterpartyLabel}`);
+    console.log(`  settlement counterparty: ${request.counterparty}`);
+    console.log(`  action: ${request.action}`);
 
     const result = await client.spend(request);
     printSpendResult(result);
@@ -87,8 +80,8 @@ function printHeader(dryRun: boolean) {
 }
 
 function runDryDemo() {
-  console.log("No AGENT_PRIVATE_KEY detected, so this is a labeled dry-run.");
-  console.log("Use real env vars for the live Arc Testnet demo.");
+  console.log("No AGENT_PRIVATE_KEY detected, so this is an agent-flow dry-run.");
+  console.log("Use real env vars for the live Arc Testnet settlement path.");
   console.log("");
 
   console.log("Budget state");
@@ -98,19 +91,28 @@ function runDryDemo() {
   console.log("  remaining today:  50 USDC");
   console.log("");
 
-  console.log("Attempt: Allowed x402-style API payment");
-  console.log("  amount: 8 USDC");
-  console.log(`  counterparty: ${SAMPLE_COUNTERPARTY}`);
-  console.log("  result: APPROVED");
-  console.log("  tx: dry-run-no-chain-tx");
-  console.log("");
-
-  console.log("Attempt: Deliberate overrun attempt");
-  console.log("  amount: 60 USDC");
-  console.log(`  counterparty: ${SAMPLE_COUNTERPARTY}`);
-  console.log("  result: REJECTED");
-  console.log("  reason: PER_TX_CAP_EXCEEDED");
-  console.log("");
+  const policy = createDemoPolicy();
+  for (const input of demoPaymentIntents) {
+    const flow = runIntentFlow(policy, input);
+    console.log(`Intent: ${flow.input}`);
+    console.log(
+      `  agent parsed: ${flow.intent.amountUsdc} USDC -> ${flow.intent.counterpartyLabel}`,
+    );
+    console.log(`  counterparty: ${flow.intent.counterparty}`);
+    console.log(`  action: ${flow.intent.action}`);
+    if (flow.intent.warnings.length > 0) {
+      console.log(`  parser warning: ${flow.intent.warnings.join(" ")}`);
+    }
+    if (flow.decision.ok) {
+      console.log("  policy result: APPROVED");
+      console.log("  tx: dry-run-no-chain-tx");
+    } else {
+      console.log("  policy result: REJECTED");
+      console.log(`  reason: ${flow.decision.reason}`);
+      console.log(`  next step: ${flow.nextStep}`);
+    }
+    console.log("");
+  }
 }
 
 function printSpendResult(result: SpendResult) {

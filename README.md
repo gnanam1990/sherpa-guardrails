@@ -14,7 +14,7 @@ Stage 1 is a working hackathon MVP. Stage 2 is the live Arc Testnet demo.
 
 | Stage | Scope | Status |
 | --- | --- | --- |
-| Stage 1 | Contracts, SDK, demo agent, dashboard, API simulator | Built locally |
+| Stage 1 | Contracts, SDK, intent parser, demo agent, dashboard, API simulator | Built locally |
 | Stage 2 | Arc Testnet deployment and live spend proof | Next |
 | Stage 3 | Wallet-connected operator console | Planned |
 | Stage 4 | x402 and agent-framework adapters | Planned |
@@ -25,6 +25,7 @@ Stage 1 is a working hackathon MVP. Stage 2 is the live Arc Testnet demo.
 - `SpendAccount` contract on Arc Testnet
 - `SpendAccountFactory` for creating agent spend accounts
 - TypeScript SDK any agent framework can use
+- Natural-language payment intent parser for agent flows
 - Demo agent operating under a `$50/day` cap
 - Public dashboard showing approved and rejected spend events
 - API for policy evaluation and simulations
@@ -51,6 +52,7 @@ USDC ERC-20: 0x3600000000000000000000000000000000000000
 packages/contracts  Solidity contracts and Foundry tests
 packages/sdk        TypeScript SDK
 packages/policy     Off-chain policy mirror and decision engine
+packages/intent     Natural-language payment intent parser and guard flow
 packages/audit      Audit records and prevented-risk summaries
 packages/simulator  Scenario runner for demos and tests
 packages/x402       x402 payment requirement guardrails
@@ -66,6 +68,7 @@ docs                Product, threat model, and demo notes
 - Product brief: `docs/PRODUCT_BRIEF.md`
 - Wednesday package: `docs/WEDNESDAY_CHECKPOINT.md`
 - Demo script: `docs/DEMO_SCRIPT.md`
+- Agent payment flow: `docs/AGENT_PAYMENT_FLOW.md`
 - Architecture: `docs/ARCHITECTURE.md`
 - Threat model: `docs/THREAT_MODEL.md`
 - Roadmap: `docs/ROADMAP.md`
@@ -104,10 +107,11 @@ https://sherpa-guardrails-j3x8jgrop-gnanam1990s-projects.vercel.app
 Operator creates a SpendAccount
 -> funds it with testnet USDC
 -> sets $50/day and $10/counterparty caps
--> agent requests $8 spend
--> contract executes and logs it
--> agent requests $60 spend
--> contract rejects and logs it
+-> agent receives "Pay 8 USDC to the x402 API provider"
+-> Sherpa parses it into a spend attempt
+-> contract executes and logs the approved spend
+-> agent tries "Pay 60 USDC"
+-> policy and contract reject the overrun
 -> dashboard shows both events
 ```
 

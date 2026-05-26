@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@sherpa/audit": "workspace:*",
+    "@sherpa/intent": "workspace:*",
     "@sherpa/policy": "workspace:*",
     "@sherpa/simulator": "workspace:*",
     "@sherpa/x402": "workspace:*",

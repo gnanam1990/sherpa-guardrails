@@ -13,6 +13,7 @@ sherpa-guardrails/
 │   ├── contracts/    Solidity SpendAccount and Foundry tests
 │   ├── sdk/          TypeScript contract client and Arc event readers
 │   ├── policy/       Off-chain policy mirror for previews and APIs
+│   ├── intent/       Natural-language payment intent parser
 │   ├── audit/        Audit records and risk summaries
 │   └── simulator/    Scenario runner for product demos and tests
 ├── scripts/          Arc connectivity and operational scripts
@@ -26,11 +27,14 @@ sequenceDiagram
   participant Operator
   participant API
   participant Agent
+  participant Intent as Intent Parser
   participant Contract as SpendAccount
   participant Dashboard
 
   Operator->>Contract: Deploy, fund, set caps
   Operator->>API: Preview policy and simulations
+  Agent->>Intent: "Pay 8 USDC to x402 provider"
+  Intent-->>Agent: Parsed counterparty, amount, action
   Agent->>Contract: requestSpend(counterparty, amount, action)
   Contract-->>Agent: Approved or typed rejection
   Contract-->>Dashboard: SpendExecuted / SpendRejected events
@@ -48,6 +52,9 @@ The API currently exposes read/simulation behavior:
 
 - `GET /health`
 - `GET /policy/demo`
+- `POST /intent/parse`
+- `POST /intent/evaluate`
+- `POST /intent/demo`
 - `POST /policy/evaluate`
 - `POST /simulate/demo`
 - `POST /simulate`

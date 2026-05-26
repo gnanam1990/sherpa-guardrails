@@ -1,4 +1,9 @@
 import {
+  demoPaymentIntents,
+  parsePaymentIntent,
+  runIntentFlow,
+} from "@sherpa/intent";
+import {
   createDemoPolicy,
   evaluateSpendPolicy,
   fromSerializablePolicy,
@@ -46,6 +51,11 @@ type X402Body = {
   action?: string;
 };
 
+type IntentBody = {
+  policy?: SerializableSpendPolicy;
+  input?: string;
+};
+
 export function handleApiRequest(
   method: string,
   pathname: string,
@@ -57,6 +67,34 @@ export function handleApiRequest(
         ok: true,
         service: "@sherpa/api",
         product: "Sherpa Guardrails",
+      });
+    }
+
+    if (method === "POST" && pathname === "/intent/parse") {
+      const payload = asIntentBody(body);
+      const input = readIntentInput(payload);
+
+      return ok(parsePaymentIntent(input));
+    }
+
+    if (method === "POST" && pathname === "/intent/evaluate") {
+      const payload = asIntentBody(body);
+      const input = readIntentInput(payload);
+      const policy = payload.policy
+        ? fromSerializablePolicy(payload.policy)
+        : createDemoPolicy();
+
+      return ok(runIntentFlow(policy, input));
+    }
+
+    if (method === "POST" && pathname === "/intent/demo") {
+      const payload = asIntentBody(body);
+      const policy = payload.policy
+        ? fromSerializablePolicy(payload.policy)
+        : createDemoPolicy();
+
+      return ok({
+        flows: demoPaymentIntents.map((input) => runIntentFlow(policy, input)),
       });
     }
 
@@ -157,6 +195,18 @@ function asSimulateBody(body: unknown): SimulateBody {
 function asX402Body(body: unknown): X402Body {
   if (!isRecord(body)) return {};
   return body as X402Body;
+}
+
+function asIntentBody(body: unknown): IntentBody {
+  if (!isRecord(body)) return {};
+  return body as IntentBody;
+}
+
+function readIntentInput(payload: IntentBody): string {
+  if (!payload.input?.trim()) {
+    throw new Error("input is required");
+  }
+  return payload.input;
 }
 
 function readX402Requirement(input: X402Body["requirement"]): X402PaymentRequirement {

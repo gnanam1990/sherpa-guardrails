@@ -26,8 +26,10 @@ Show the contract tests passing. Explain that the contract enforces:
 
 ### 45-65s: Agent Demo
 
-Run the demo agent. The first request spends 8 USDC and is approved. The second
-request tries 60 USDC and is rejected by the contract policy.
+Run the demo agent. It receives plain-English payment intents, parses each one
+into amount/counterparty/action, then checks Sherpa policy. The first request
+spends 8 USDC and is approved. The second tries 60 USDC and is rejected. The
+third tries an unknown vendor and is blocked.
 
 ```bash
 pnpm --filter sherpa-demo-agent start -- --dry-run
