@@ -39,6 +39,9 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+      viem:
+        specifier: ^2.51.0
+        version: 2.51.0(typescript@5.9.3)
 
   apps/dashboard:
     dependencies:
