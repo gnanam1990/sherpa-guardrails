@@ -88,7 +88,7 @@ flowchart LR
 ## Submission Links
 
 - Repository: `https://github.com/gnanam1990/sherpa-guardrails`
-- Prototype: add Vercel URL after deployment
+- Prototype: `https://sherpa-guardrails-j3x8jgrop-gnanam1990s-projects.vercel.app`
 - Demo video: add Loom/YouTube URL after recording
 - Public launch post: add LinkedIn/X URL after posting
 

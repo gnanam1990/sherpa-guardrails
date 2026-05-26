@@ -89,6 +89,12 @@ pnpm --filter sherpa-dashboard build
 
 Vercel output directory: `apps/dashboard/dist`.
 
+Current preview:
+
+```text
+https://sherpa-guardrails-j3x8jgrop-gnanam1990s-projects.vercel.app
+```
+
 ## Core Demo
 
 ```text

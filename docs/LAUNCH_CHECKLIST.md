@@ -12,7 +12,7 @@
 - [x] API simulation surface
 - [ ] Arc Testnet deployment
 - [ ] Live demo transaction
-- [ ] Vercel preview URL
+- [x] Vercel preview URL
 
 ## Before Friday Final
 
@@ -34,6 +34,12 @@ The live Arc demo cannot be produced without:
 - `COUNTERPARTY_ADDRESS`
 - `ARC_TESTNET_RPC_URL`
 - `ARC_USDC_ADDRESS`
+
+## Current Preview
+
+```text
+https://sherpa-guardrails-j3x8jgrop-gnanam1990s-projects.vercel.app
+```
 
 ## Demo Recording Order
 
