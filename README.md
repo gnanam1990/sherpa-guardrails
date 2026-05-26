@@ -41,6 +41,13 @@ apps/dashboard      Public audit dashboard
 docs                Product, threat model, and demo notes
 ```
 
+## Hackathon Checkpoint
+
+- Product brief: `docs/PRODUCT_BRIEF.md`
+- Wednesday package: `docs/WEDNESDAY_CHECKPOINT.md`
+- Demo script: `docs/DEMO_SCRIPT.md`
+- Deployment runbook: `docs/DEPLOYMENT.md`
+
 ## Local Setup
 
 ```bash
