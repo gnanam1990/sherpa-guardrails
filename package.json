@@ -8,6 +8,7 @@
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
     "lint": "pnpm -r lint",
+    "arc:check": "tsx scripts/check-arc.ts",
     "contracts:build": "forge build --root packages/contracts",
     "contracts:test": "forge test --root packages/contracts",
     "contracts:coverage": "forge coverage --root packages/contracts"
