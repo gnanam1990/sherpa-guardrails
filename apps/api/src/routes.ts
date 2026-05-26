@@ -8,6 +8,10 @@ import {
   type SpendAttempt,
 } from "@sherpa/policy";
 import { runDemoSimulation, runSpendSimulation } from "@sherpa/simulator";
+import {
+  guardX402Payment,
+  type X402PaymentRequirement,
+} from "@sherpa/x402";
 
 export type ApiResponse = {
   status: number;
@@ -26,6 +30,20 @@ type EvaluateBody = {
 type SimulateBody = {
   policy?: SerializableSpendPolicy;
   attempts?: EvaluateBody["attempt"][];
+};
+
+type X402Body = {
+  policy?: SerializableSpendPolicy;
+  requirement?: {
+    resource?: string;
+    description?: string;
+    amountBaseUnits?: string;
+    asset?: string;
+    network?: string;
+    payTo?: string;
+    facilitatorUrl?: string;
+  };
+  action?: string;
 };
 
 export function handleApiRequest(
@@ -73,6 +91,22 @@ export function handleApiRequest(
       return ok(runSpendSimulation(policy, attempts));
     }
 
+    if (method === "POST" && pathname === "/x402/guard") {
+      const payload = asX402Body(body);
+      const policy = payload.policy
+        ? fromSerializablePolicy(payload.policy)
+        : createDemoPolicy();
+      const requirement = readX402Requirement(payload.requirement);
+
+      return ok(
+        guardX402Payment({
+          policy,
+          requirement,
+          action: payload.action,
+        }),
+      );
+    }
+
     return {
       status: 404,
       body: { error: "Route not found", method, pathname },
@@ -118,6 +152,36 @@ function asEvaluateBody(body: unknown): EvaluateBody {
 function asSimulateBody(body: unknown): SimulateBody {
   if (!isRecord(body)) return {};
   return body as SimulateBody;
+}
+
+function asX402Body(body: unknown): X402Body {
+  if (!isRecord(body)) return {};
+  return body as X402Body;
+}
+
+function readX402Requirement(input: X402Body["requirement"]): X402PaymentRequirement {
+  if (!input) throw new Error("requirement is required");
+  if (!input.resource) throw new Error("requirement.resource is required");
+  if (!input.amountBaseUnits) {
+    throw new Error("requirement.amountBaseUnits is required");
+  }
+  if (input.asset !== "USDC") {
+    throw new Error("requirement.asset must be USDC");
+  }
+  if (!input.network) throw new Error("requirement.network is required");
+  if (!input.payTo?.startsWith("0x")) {
+    throw new Error("requirement.payTo must be a 0x address");
+  }
+
+  return {
+    resource: input.resource,
+    description: input.description,
+    amountBaseUnits: BigInt(input.amountBaseUnits),
+    asset: "USDC",
+    network: input.network,
+    payTo: input.payTo as HexAddress,
+    facilitatorUrl: input.facilitatorUrl,
+  };
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

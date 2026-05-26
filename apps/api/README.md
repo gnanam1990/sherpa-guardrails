@@ -16,6 +16,7 @@ GET  /policy/demo
 POST /policy/evaluate
 POST /simulate/demo
 POST /simulate
+POST /x402/guard
 ```
 
 The API is intentionally lightweight for the hackathon sprint. It exposes the

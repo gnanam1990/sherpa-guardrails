@@ -53,6 +53,7 @@ packages/sdk        TypeScript SDK
 packages/policy     Off-chain policy mirror and decision engine
 packages/audit      Audit records and prevented-risk summaries
 packages/simulator  Scenario runner for demos and tests
+packages/x402       x402 payment requirement guardrails
 apps/api            HTTP API for policy evaluation and simulations
 apps/agent          Demo autonomous spending agent
 apps/dashboard      Public audit dashboard
@@ -67,6 +68,7 @@ docs                Product, threat model, and demo notes
 - Architecture: `docs/ARCHITECTURE.md`
 - Threat model: `docs/THREAT_MODEL.md`
 - Roadmap: `docs/ROADMAP.md`
+- Integrations: `docs/INTEGRATIONS.md`
 - Deployment runbook: `docs/DEPLOYMENT.md`
 
 ## Local Setup

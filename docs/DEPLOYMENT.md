@@ -18,10 +18,25 @@ AGENT_ADDRESS=...
 COUNTERPARTY_ADDRESS=...
 ```
 
+Generate fresh demo wallets if needed:
+
+```bash
+pnpm wallets:demo
+```
+
+Copy the generated values into `.env`, then fund the printed
+`OPERATOR_ADDRESS` on Arc Testnet before broadcasting deployment scripts.
+
 Check RPC connectivity:
 
 ```bash
 pnpm arc:check
+```
+
+Check live deployment readiness:
+
+```bash
+pnpm live:ready
 ```
 
 Deploy:

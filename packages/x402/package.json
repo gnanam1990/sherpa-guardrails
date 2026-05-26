@@ -1,27 +1,27 @@
 {
-  "name": "@sherpa/api",
+  "name": "@sherpa/x402",
   "version": "0.1.0-alpha.0",
   "private": true,
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "lint": "tsc -p tsconfig.json --noEmit",
-    "dev": "tsx src/main.ts",
-    "start": "node dist/main.js"
+    "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@sherpa/audit": "workspace:*",
-    "@sherpa/policy": "workspace:*",
-    "@sherpa/simulator": "workspace:*",
-    "@sherpa/x402": "workspace:*",
-    "tsx": "^4.22.3",
-    "typescript": "^5.9.3"
+    "@sherpa/policy": "workspace:*"
   },
   "devDependencies": {
+    "typescript": "^5.9.3",
     "vitest": "^4.1.7"
   }
 }

@@ -32,4 +32,24 @@ describe("handleApiRequest", () => {
       },
     });
   });
+
+  it("guards x402 payment requirements", () => {
+    const response = handleApiRequest("POST", "/x402/guard", {
+      requirement: {
+        resource: "https://api.example.test/vector-search",
+        amountBaseUnits: "8000000",
+        asset: "USDC",
+        network: "arc-testnet",
+        payTo: "0x000000000000000000000000000000000000dEaD",
+      },
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      decision: {
+        ok: true,
+        reason: "NONE",
+      },
+    });
+  });
 });

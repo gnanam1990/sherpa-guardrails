@@ -10,7 +10,10 @@
     "lint": "pnpm -r lint",
     "api:dev": "pnpm --filter @sherpa/api dev",
     "api:test": "pnpm --filter @sherpa/api test",
+    "x402:test": "pnpm --filter @sherpa/x402 test",
+    "wallets:demo": "tsx scripts/create-demo-wallets.ts",
     "arc:check": "tsx scripts/check-arc.ts",
+    "live:ready": "tsx scripts/live-readiness.ts",
     "contracts:build": "forge build --root packages/contracts",
     "contracts:test": "forge test --root packages/contracts",
     "contracts:coverage": "forge coverage --root packages/contracts"

@@ -13,6 +13,8 @@
 - [ ] Arc Testnet deployment
 - [ ] Live demo transaction
 - [x] Vercel preview URL
+- [x] Live deployment readiness script
+- [x] Demo wallet generator
 
 ## Before Friday Final
 

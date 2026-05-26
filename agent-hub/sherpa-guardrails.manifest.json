@@ -1,0 +1,39 @@
+{
+  "name": "Sherpa Guardrails",
+  "slug": "sherpa-guardrails",
+  "version": "0.1.0-alpha",
+  "description": "Smart-contract-backed spend controls for autonomous agents using USDC budgets, counterparty limits, and on-chain audit logs.",
+  "repository": "https://github.com/gnanam1990/sherpa-guardrails",
+  "dashboard": "https://sherpa-guardrails-j3x8jgrop-gnanam1990s-projects.vercel.app",
+  "chain": {
+    "name": "Arc Testnet",
+    "chainId": 5042002,
+    "settlementAsset": "USDC"
+  },
+  "capabilities": [
+    "policy_evaluation",
+    "x402_payment_guardrails",
+    "contract_spend_execution",
+    "audit_event_reading",
+    "agent_budget_simulation"
+  ],
+  "environment": [
+    "ARC_TESTNET_RPC_URL",
+    "ARC_USDC_ADDRESS",
+    "SPEND_ACCOUNT_ADDRESS",
+    "AGENT_PRIVATE_KEY",
+    "COUNTERPARTY_ADDRESS"
+  ],
+  "safety": {
+    "liveFunds": "testnet_only",
+    "operatorApproval": "required_for_deploy_and_funding",
+    "agentCustody": "limited_to_requestSpend"
+  },
+  "entrypoints": {
+    "api": "apps/api",
+    "dashboard": "apps/dashboard",
+    "agent": "apps/agent",
+    "sdk": "packages/sdk",
+    "x402": "packages/x402"
+  }
+}
