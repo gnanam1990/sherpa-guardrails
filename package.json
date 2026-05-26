@@ -1,0 +1,35 @@
+{
+  "name": "sherpa-guardrails",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Smart-contract-backed spend controls for autonomous AI agents on Arc.",
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "contracts:build": "forge build --root packages/contracts",
+    "contracts:test": "forge test --root packages/contracts",
+    "contracts:coverage": "forge coverage --root packages/contracts"
+  },
+  "keywords": [
+    "ai-agents",
+    "usdc",
+    "arc",
+    "smart-contracts",
+    "spend-controls"
+  ],
+  "author": "gnanam (@gnanam1990)",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.19.25",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.4.0",
+    "viem": "^2.41.2"
+  },
+  "packageManager": "pnpm@9.15.9"
+}
