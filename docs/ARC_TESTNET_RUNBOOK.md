@@ -81,8 +81,12 @@ pnpm testnet:fund
 Default funding:
 
 ```text
-50 USDC
+50 USDC in `.env.example`
 ```
+
+For faucet-funded demos, set `DEMO_FUND_AMOUNT_BASE_UNITS=10000000` in `.env`
+to fund 10 USDC. The live demo only needs 8 USDC for the approved spend; the
+over-cap and blocked-vendor attempts are rejected before funds move.
 
 ## 7. Run The Agent
 

@@ -81,6 +81,10 @@ Fund the account for the live demo:
 pnpm testnet:fund
 ```
 
+`testnet:fund` uses a direct `cast send` to the Arc USDC ERC-20 interface. This
+avoids local Foundry simulation issues around Arc's native USDC precompile while
+still broadcasting the standard `transfer(address,uint256)` transaction.
+
 Run the live agent:
 
 ```bash

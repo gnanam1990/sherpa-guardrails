@@ -70,6 +70,7 @@ docs                Product, threat model, and demo notes
 - Demo script: `docs/DEMO_SCRIPT.md`
 - Agent payment flow: `docs/AGENT_PAYMENT_FLOW.md`
 - Arc testnet runbook: `docs/ARC_TESTNET_RUNBOOK.md`
+- Live Arc proof: `docs/LIVE_ARC_PROOF.md`
 - Architecture: `docs/ARCHITECTURE.md`
 - Threat model: `docs/THREAT_MODEL.md`
 - Roadmap: `docs/ROADMAP.md`

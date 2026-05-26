@@ -113,10 +113,15 @@ async function main() {
   console.log("");
   printSection("Live demo readiness");
   const accountBalance = await erc20Balance(spendAccountAddress);
+  const state = await createGuardrailsClient({
+    accountAddress: spendAccountAddress,
+    rpcUrl,
+  }).state();
+  const observedDemoLiquidity = accountBalance + state.daySpent;
   printCheck(
-    accountBalance >= 8_000_000n ? "OK" : "MISSING",
-    "SpendAccount funding",
-    `${formatUsdc(accountBalance)} USDC`,
+    observedDemoLiquidity >= 8_000_000n ? "OK" : "MISSING",
+    "Demo liquidity",
+    `${formatUsdc(accountBalance)} USDC balance + ${formatUsdc(state.daySpent)} USDC spent`,
   );
   printCheck(
     deployer ? "OK" : "MISSING",

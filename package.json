@@ -18,9 +18,9 @@
     "testnet:status": "tsx scripts/testnet-status.ts",
     "testnet:deploy": "forge script packages/contracts/script/DeployArc.s.sol:DeployArc --root packages/contracts --rpc-url arc_testnet --broadcast",
     "testnet:configure": "forge script packages/contracts/script/ConfigureDemo.s.sol:ConfigureDemo --root packages/contracts --rpc-url arc_testnet --broadcast",
-    "testnet:fund": "forge script packages/contracts/script/FundSpendAccount.s.sol:FundSpendAccount --root packages/contracts --rpc-url arc_testnet --broadcast",
-    "testnet:agent": "pnpm --filter sherpa-demo-agent start",
-    "testnet:dashboard": "pnpm --filter sherpa-dashboard dev",
+    "testnet:fund": "bash -lc 'set -a; source .env; set +a; cast send \"$ARC_USDC_ADDRESS\" \"transfer(address,uint256)\" \"$SPEND_ACCOUNT_ADDRESS\" \"$DEMO_FUND_AMOUNT_BASE_UNITS\" --rpc-url \"$ARC_TESTNET_RPC_URL\" --private-key \"$DEPLOYER_PRIVATE_KEY\"'",
+    "testnet:agent": "bash -lc 'set -a; source .env; set +a; pnpm --filter sherpa-demo-agent start'",
+    "testnet:dashboard": "bash -lc 'set -a; source .env; set +a; pnpm --filter sherpa-dashboard dev'",
     "contracts:build": "forge build --root packages/contracts",
     "contracts:test": "forge test --root packages/contracts",
     "contracts:coverage": "forge coverage --root packages/contracts"

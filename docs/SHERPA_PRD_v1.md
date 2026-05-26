@@ -374,14 +374,17 @@ Built:
 
 Pending:
 
+- demo recording
+
+Live completed:
+
 - funded Arc Testnet deployer wallet
 - live contract deployment
 - live spend account funding
 - live approved transaction
-- live rejected transaction
+- live rejected transactions
 - dashboard connected to deployed account
-- demo recording
-- Arc Testnet proof runbook in `docs/ARC_TESTNET_RUNBOOK.md`
+- Arc Testnet proof in `docs/LIVE_ARC_PROOF.md`
 
 ## 19. Roadmap
 
