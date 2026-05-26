@@ -8,6 +8,18 @@ Sherpa Guardrails is a smart-contract-backed spend manager on Arc Testnet. Opera
 
 Sherpa Guardrails is a corporate card for autonomous agents: USDC budgets, daily caps, per-counterparty limits, and public audit logs enforced by smart contracts, not app-layer checks.
 
+## Product Status
+
+Stage 1 is a working hackathon MVP. Stage 2 is the live Arc Testnet demo.
+
+| Stage | Scope | Status |
+| --- | --- | --- |
+| Stage 1 | Contracts, SDK, demo agent, dashboard, API simulator | Built locally |
+| Stage 2 | Arc Testnet deployment and live spend proof | Next |
+| Stage 3 | Wallet-connected operator console | Planned |
+| Stage 4 | x402 and agent-framework adapters | Planned |
+| Stage 5 | Production hardening and audit prep | Planned |
+
 ## Sprint Deliverables
 
 - `SpendAccount` contract on Arc Testnet
@@ -15,6 +27,8 @@ Sherpa Guardrails is a corporate card for autonomous agents: USDC budgets, daily
 - TypeScript SDK any agent framework can use
 - Demo agent operating under a `$50/day` cap
 - Public dashboard showing approved and rejected spend events
+- API for policy evaluation and simulations
+- Policy, audit, and simulator packages for product logic
 - x402-compatible wrapper as a stretch goal
 
 ## Why Arc
@@ -36,6 +50,10 @@ USDC ERC-20: 0x3600000000000000000000000000000000000000
 ```text
 packages/contracts  Solidity contracts and Foundry tests
 packages/sdk        TypeScript SDK
+packages/policy     Off-chain policy mirror and decision engine
+packages/audit      Audit records and prevented-risk summaries
+packages/simulator  Scenario runner for demos and tests
+apps/api            HTTP API for policy evaluation and simulations
 apps/agent          Demo autonomous spending agent
 apps/dashboard      Public audit dashboard
 docs                Product, threat model, and demo notes
@@ -46,6 +64,9 @@ docs                Product, threat model, and demo notes
 - Product brief: `docs/PRODUCT_BRIEF.md`
 - Wednesday package: `docs/WEDNESDAY_CHECKPOINT.md`
 - Demo script: `docs/DEMO_SCRIPT.md`
+- Architecture: `docs/ARCHITECTURE.md`
+- Threat model: `docs/THREAT_MODEL.md`
+- Roadmap: `docs/ROADMAP.md`
 - Deployment runbook: `docs/DEPLOYMENT.md`
 
 ## Local Setup
@@ -55,6 +76,7 @@ pnpm install
 cp .env.example .env
 pnpm contracts:build
 pnpm contracts:test
+pnpm --filter @sherpa/api dev
 ```
 
 ## Core Demo

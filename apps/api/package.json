@@ -1,0 +1,26 @@
+{
+  "name": "@sherpa/api",
+  "version": "0.1.0-alpha.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "dev": "tsx src/main.ts",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "@sherpa/audit": "workspace:*",
+    "@sherpa/policy": "workspace:*",
+    "@sherpa/simulator": "workspace:*",
+    "tsx": "^4.22.3",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.7"
+  }
+}
