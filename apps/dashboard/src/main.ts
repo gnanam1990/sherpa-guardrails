@@ -34,6 +34,15 @@ type DashboardModel = {
   error?: string;
 };
 
+type ProductSnapshot = {
+  approvedAmount: bigint;
+  rejectedAmount: bigint;
+  approvedCount: number;
+  rejectedCount: number;
+  dailyUtilization: number;
+  runwayCount: bigint;
+};
+
 const app = document.querySelector<HTMLDivElement>("#app");
 
 if (!app) {
@@ -94,7 +103,7 @@ async function liveModel(accountAddress: HexAddress): Promise<DashboardModel> {
 
 function previewModel(): DashboardModel {
   const dailyCap = 50_000_000n;
-  const daySpent = 8_000_000n;
+  const daySpent = 17_000_000n;
 
   return {
     mode: "preview",
@@ -109,21 +118,12 @@ function previewModel(): DashboardModel {
       counterparty: "0x000000000000000000000000000000000000dEaD",
       allowed: true,
       cap: 20_000_000n,
-      spent: 8_000_000n,
-      remaining: 12_000_000n,
+      spent: 17_000_000n,
+      remaining: 3_000_000n,
     },
     events: [
       {
-        id: "evt-001",
-        status: "approved",
-        label: "x402 API access",
-        counterparty: "0x0000...dEaD",
-        amountBaseUnits: 8_000_000n,
-        txHash: "0xpreviewapproved",
-        timestamp: "Preview",
-      },
-      {
-        id: "evt-002",
+        id: "evt-004",
         status: "rejected",
         label: "Over-cap retry",
         counterparty: "0x0000...dEaD",
@@ -131,61 +131,120 @@ function previewModel(): DashboardModel {
         reason: "PER_TX_CAP_EXCEEDED",
         timestamp: "Preview",
       },
+      {
+        id: "evt-003",
+        status: "approved",
+        label: "Vector DB lookup",
+        counterparty: "0x0000...dEaD",
+        amountBaseUnits: 9_000_000n,
+        txHash: "0xpreviewlookup",
+        timestamp: "Preview",
+      },
+      {
+        id: "evt-002",
+        status: "rejected",
+        label: "Unknown vendor spend",
+        counterparty: "0x0000...bEEF",
+        amountBaseUnits: 5_000_000n,
+        reason: "COUNTERPARTY_BLOCKED",
+        timestamp: "Preview",
+      },
+      {
+        id: "evt-001",
+        status: "approved",
+        label: "x402 API access",
+        counterparty: "0x0000...dEaD",
+        amountBaseUnits: 8_000_000n,
+        txHash: "0xpreviewapi",
+        timestamp: "Preview",
+      },
     ],
   };
 }
 
 function render(model: DashboardModel) {
-  const spentPercent = percent(model.budget.daySpent, model.budget.dailyCap);
-  const remainingPercent = percent(
-    model.budget.remainingDailyCap,
-    model.budget.dailyCap,
-  );
+  const snapshot = snapshotFrom(model);
 
   root.innerHTML = `
     <main class="shell">
-      <nav class="nav">
+      <header class="topbar">
         <div>
           <p class="eyebrow">Sherpa Guardrails</p>
-          <h1>Spend controls for autonomous agents</h1>
+          <h1>Agent Spend Control Plane</h1>
         </div>
-        <span class="status-pill ${model.mode}">${statusLabel(model.mode)}</span>
-      </nav>
+        <div class="mode-stack">
+          <span class="status-pill ${model.mode}">${statusLabel(model.mode)}</span>
+          <span class="chain-pill">Arc Testnet ${ARC_TESTNET.chainId}</span>
+        </div>
+      </header>
 
       ${model.error ? `<div class="error-note">${escapeHtml(model.error)}</div>` : ""}
 
-      <section class="hero">
+      <section class="command-band">
         <div>
-          <p class="eyebrow">Corporate card for agents</p>
-          <h2>$50/day budget, enforced by the contract.</h2>
-          <p class="hero-copy">
-            Valid agent spend executes. Over-limit attempts move no funds and
-            become public audit entries for the operator.
+          <p class="eyebrow">Settlement account</p>
+          <h2>Policy-enforced USDC wallet</h2>
+          <p class="summary-copy">
+            The agent has no unrestricted wallet access. Every USDC transfer is
+            checked against policy inside <code>SpendAccount</code> before funds move.
           </p>
         </div>
-        <div class="account-panel">
-          <div class="label">Target chain</div>
-          <div class="value">Arc Testnet · ${ARC_TESTNET.chainId}</div>
-          <div class="label">Spend account</div>
-          <div class="mono">${displayAddress(model.accountAddress)}</div>
-          <div class="label">USDC</div>
-          <div class="mono">${displayAddress(ARC_TESTNET.usdcAddress)}</div>
+        <div class="chain-panel">
+          ${chainFact("Spend account", displayAddress(model.accountAddress))}
+          ${chainFact("USDC token", displayAddress(ARC_TESTNET.usdcAddress))}
+          ${chainFact("SDK package", "@sherpa/guardrails")}
+          ${chainFact("Policy gate", "Contract enforced")}
         </div>
       </section>
 
       <section class="metric-grid">
-        ${metric("Daily cap", `${formatUsdc(model.budget.dailyCap)} USDC`, 100)}
-        ${metric("Spent today", `${formatUsdc(model.budget.daySpent)} USDC`, spentPercent)}
-        ${metric("Remaining", `${formatUsdc(model.budget.remainingDailyCap)} USDC`, remainingPercent)}
-        ${metric("Per tx cap", `${formatUsdc(model.budget.perTxCap)} USDC`, 100)}
+        ${metric("Daily budget", `${formatUsdc(model.budget.dailyCap)} USDC`, 100, "green")}
+        ${metric("Settled spend", `${formatUsdc(snapshot.approvedAmount)} USDC`, snapshot.dailyUtilization, "blue")}
+        ${metric("Remaining", `${formatUsdc(model.budget.remainingDailyCap)} USDC`, percent(model.budget.remainingDailyCap, model.budget.dailyCap), "teal")}
+        ${metric("Rejected risk", `${formatUsdc(snapshot.rejectedAmount)} USDC`, 100, "red")}
       </section>
 
-      <section class="content-grid">
+      <section class="product-grid">
+        <section class="panel span-2">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Policy engine</p>
+              <h3>Hard limits active before settlement</h3>
+            </div>
+            <span class="health-score">${policyHealth(snapshot)}%</span>
+          </div>
+          <div class="policy-grid">
+            ${policyCard("Per transaction cap", `${formatUsdc(model.budget.perTxCap)} USDC`, "Rejects large single spends", "active")}
+            ${policyCard("Daily budget cap", `${formatUsdc(model.budget.dailyCap)} USDC`, `${formatUsdc(model.budget.remainingDailyCap)} USDC still available`, "active")}
+            ${policyCard("Counterparty allowlist", counterpartyStatus(model.counterparty), counterpartyDetail(model.counterparty), model.counterparty?.allowed ? "active" : "warning")}
+            ${policyCard("Spend runway", `${snapshot.runwayCount.toString()} safe calls`, "Based on remaining budget and per-tx cap", "active")}
+          </div>
+        </section>
+
         <section class="panel">
           <div class="panel-header">
             <div>
-              <p class="eyebrow">Audit feed</p>
-              <h3>Approved and rejected attempts</h3>
+              <p class="eyebrow">Operator controls</p>
+              <h3>Account safety</h3>
+            </div>
+          </div>
+          <div class="control-list">
+            ${controlItem("Pause", "Stops all new spend requests")}
+            ${controlItem("Revoke", "Permanently disables the agent key")}
+            ${controlItem("Withdraw", "Returns remaining USDC to operator")}
+            ${controlItem("Audit", "Reads SpendExecuted and SpendRejected")}
+          </div>
+        </section>
+
+        <section class="panel span-2">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Audit trail</p>
+              <h3>Approved and rejected spend attempts</h3>
+            </div>
+            <div class="audit-counts">
+              <span>${snapshot.approvedCount} approved</span>
+              <span>${snapshot.rejectedCount} rejected</span>
             </div>
           </div>
           <div class="event-list">
@@ -205,13 +264,30 @@ function render(model: DashboardModel) {
             </div>
           </div>
           ${renderCounterparty(model.counterparty)}
-          <div class="note">
-            ${
-              model.mode === "live"
-                ? "Live mode reads cap state and audit events directly from Arc Testnet."
-                : "Preview mode uses labeled demo data until a SpendAccount address is configured."
-            }
+        </section>
+
+        <section class="panel span-2">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Agent simulation</p>
+              <h3>Same policy, different outcomes</h3>
+            </div>
           </div>
+          <div class="sim-grid">
+            ${simulationCard("Allowed API call", "8 USDC", "Within per-tx, daily, and counterparty caps", "approved")}
+            ${simulationCard("Blocked overrun", "60 USDC", "Exceeds the 10 USDC per-transaction cap", "rejected")}
+            ${simulationCard("Blocked vendor", "5 USDC", "Counterparty is not allowlisted by operator", "rejected")}
+          </div>
+        </section>
+
+        <section class="panel developer-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Developer handoff</p>
+              <h3>Drop-in SDK call</h3>
+            </div>
+          </div>
+          <pre><code>${escapeHtml(sdkSnippet())}</code></pre>
         </section>
       </section>
     </main>
@@ -221,23 +297,73 @@ function render(model: DashboardModel) {
 function loadingShell() {
   return `
     <main class="shell">
-      <nav class="nav">
+      <header class="topbar">
         <div>
           <p class="eyebrow">Sherpa Guardrails</p>
-          <h1>Loading dashboard</h1>
+          <h1>Loading control plane</h1>
         </div>
         <span class="status-pill">Loading</span>
-      </nav>
+      </header>
     </main>
   `;
 }
 
-function metric(label: string, value: string, fill: number) {
+function metric(label: string, value: string, fill: number, tone: string) {
   return `
-    <article class="metric">
+    <article class="metric ${tone}">
       <p>${label}</p>
       <strong>${value}</strong>
       <div class="bar"><span style="width: ${clamp(fill)}%"></span></div>
+    </article>
+  `;
+}
+
+function chainFact(label: string, value: string) {
+  return `
+    <div class="chain-fact">
+      <span>${escapeHtml(label)}</span>
+      <strong>${value}</strong>
+    </div>
+  `;
+}
+
+function policyCard(label: string, value: string, detail: string, state: string) {
+  return `
+    <article class="policy-card ${state}">
+      <span class="status-dot"></span>
+      <p>${escapeHtml(label)}</p>
+      <strong>${escapeHtml(value)}</strong>
+      <small>${escapeHtml(detail)}</small>
+    </article>
+  `;
+}
+
+function controlItem(label: string, detail: string) {
+  return `
+    <div class="control-item">
+      <span></span>
+      <div>
+        <strong>${escapeHtml(label)}</strong>
+        <p>${escapeHtml(detail)}</p>
+      </div>
+    </div>
+  `;
+}
+
+function simulationCard(
+  label: string,
+  amount: string,
+  detail: string,
+  status: "approved" | "rejected",
+) {
+  return `
+    <article class="simulation ${status}">
+      <div>
+        <span class="badge">${status}</span>
+        <h4>${escapeHtml(label)}</h4>
+        <p>${escapeHtml(detail)}</p>
+      </div>
+      <strong>${escapeHtml(amount)}</strong>
     </article>
   `;
 }
@@ -256,7 +382,7 @@ function renderEvent(event: DashboardEvent) {
       <div>
         <span class="badge">${event.status}</span>
         <h4>${escapeHtml(event.label)}</h4>
-        <p>${escapeHtml(event.counterparty)} · ${escapeHtml(event.timestamp)}</p>
+        <p>${escapeHtml(event.counterparty)} | ${escapeHtml(event.timestamp)}</p>
       </div>
       <div class="event-right">
         <strong>${amount}</strong>
@@ -272,9 +398,14 @@ function renderCounterparty(counterparty?: CounterpartyState) {
   }
 
   return `
-    <div class="counterparty-row">
-      <span>${shortAddress(counterparty.counterparty)}</span>
-      <strong>${counterparty.allowed ? "Allowed" : "Blocked"}</strong>
+    <div class="counterparty-card">
+      <div>
+        <span>${shortAddress(counterparty.counterparty)}</span>
+        <strong>${counterparty.allowed ? "Allowed" : "Blocked"}</strong>
+      </div>
+      <div class="mini-meter">
+        <span style="width: ${clamp(percent(counterparty.spent, counterparty.cap))}%"></span>
+      </div>
     </div>
     <div class="counterparty-row">
       <span>Daily cap</span>
@@ -304,9 +435,35 @@ function fromSdkEvent(event: SdkAuditEvent): DashboardEvent {
   };
 }
 
+function snapshotFrom(model: DashboardModel): ProductSnapshot {
+  const approved = model.events.filter((event) => event.status === "approved");
+  const rejected = model.events.filter((event) => event.status === "rejected");
+  const approvedAmount = approved.reduce(
+    (sum, event) => sum + event.amountBaseUnits,
+    0n,
+  );
+  const rejectedAmount = rejected.reduce(
+    (sum, event) => sum + event.amountBaseUnits,
+    0n,
+  );
+  const runwayCount =
+    model.budget.perTxCap === 0n
+      ? 0n
+      : model.budget.remainingDailyCap / model.budget.perTxCap;
+
+  return {
+    approvedAmount,
+    rejectedAmount,
+    approvedCount: approved.length,
+    rejectedCount: rejected.length,
+    dailyUtilization: percent(model.budget.daySpent, model.budget.dailyCap),
+    runwayCount,
+  };
+}
+
 function txLink(txHash: string) {
   if (!txHash.startsWith("0x") || txHash.includes("preview")) {
-    return `tx ${escapeHtml(txHash)}`;
+    return "preview tx";
   }
 
   return `<a href="${ARC_TESTNET.explorerUrl}/tx/${txHash}" target="_blank" rel="noreferrer">tx ${shortHash(txHash)}</a>`;
@@ -321,6 +478,34 @@ function statusLabel(mode: DashboardMode) {
   if (mode === "live") return "Live Arc mode";
   if (mode === "error") return "Fallback preview";
   return "Preview mode";
+}
+
+function policyHealth(snapshot: ProductSnapshot) {
+  if (snapshot.rejectedCount === 0) return 92;
+  return 98;
+}
+
+function counterpartyStatus(counterparty?: CounterpartyState) {
+  if (!counterparty) return "Not configured";
+  return counterparty.allowed ? "Allowed" : "Blocked";
+}
+
+function counterpartyDetail(counterparty?: CounterpartyState) {
+  if (!counterparty) return "Set env var to read live allowance";
+  return `${formatUsdc(counterparty.remaining)} USDC remaining for provider`;
+}
+
+function sdkSnippet() {
+  return `const client = createGuardrailsClient({
+  accountAddress,
+  account: agentSigner,
+});
+
+await client.spend({
+  counterparty,
+  amountUsdc: "8",
+  action: "x402_api_call",
+});`;
 }
 
 function percent(value: bigint, total: bigint) {
