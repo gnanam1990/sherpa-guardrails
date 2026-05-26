@@ -5,6 +5,7 @@ import {
   keccak256,
   toBytes,
   type Chain,
+  type Hex,
   type PublicClient,
   type WalletClient,
 } from "viem";
@@ -13,7 +14,10 @@ import { parseUsdc } from "./amounts.js";
 import { arcTestnet } from "./chain.js";
 import { decodeRejectionReason } from "./reasons.js";
 import type {
+  AuditEvent,
+  AuditEventQuery,
   BudgetState,
+  CounterpartyState,
   GuardrailsClientConfig,
   HexAddress,
   SpendRequest,
@@ -23,7 +27,7 @@ import type {
 export class GuardrailsClient {
   readonly accountAddress: HexAddress;
   readonly publicClient: PublicClient;
-  readonly walletClient: WalletClient;
+  readonly walletClient?: WalletClient;
   readonly chain: Chain;
 
   constructor(private readonly config: GuardrailsClientConfig) {
@@ -32,11 +36,13 @@ export class GuardrailsClient {
 
     this.accountAddress = config.accountAddress;
     this.publicClient = createPublicClient({ chain: this.chain, transport });
-    this.walletClient = createWalletClient({
-      account: config.account,
-      chain: this.chain,
-      transport,
-    });
+    if (config.account) {
+      this.walletClient = createWalletClient({
+        account: config.account,
+        chain: this.chain,
+        transport,
+      });
+    }
   }
 
   async state(): Promise<BudgetState> {
@@ -85,6 +91,10 @@ export class GuardrailsClient {
   }
 
   async spend(request: SpendRequest): Promise<SpendResult> {
+    if (!this.config.account || !this.walletClient) {
+      throw new Error("GuardrailsClient.spend requires a signer account");
+    }
+
     const amountBaseUnits = parseUsdc(request.amountUsdc);
     const reasonValue = await this.publicClient.readContract({
       address: this.accountAddress,
@@ -123,6 +133,116 @@ export class GuardrailsClient {
       amountBaseUnits,
     };
   }
+
+  async counterpartyState(counterparty: HexAddress): Promise<CounterpartyState> {
+    const [allowed, cap, spent, remaining] = await Promise.all([
+      this.publicClient.readContract({
+        address: this.accountAddress,
+        abi: spendAccountAbi,
+        functionName: "counterpartyAllowed",
+        args: [counterparty],
+      }),
+      this.publicClient.readContract({
+        address: this.accountAddress,
+        abi: spendAccountAbi,
+        functionName: "counterpartyCap",
+        args: [counterparty],
+      }),
+      this.publicClient.readContract({
+        address: this.accountAddress,
+        abi: spendAccountAbi,
+        functionName: "counterpartySpent",
+        args: [counterparty],
+      }),
+      this.publicClient.readContract({
+        address: this.accountAddress,
+        abi: spendAccountAbi,
+        functionName: "remainingCounterpartyCap",
+        args: [counterparty],
+      }),
+    ]);
+
+    return {
+      counterparty,
+      allowed,
+      cap,
+      spent,
+      remaining,
+    };
+  }
+
+  async auditEvents(query: AuditEventQuery = {}): Promise<AuditEvent[]> {
+    const fromBlock = query.fromBlock ?? 0n;
+    const toBlock = query.toBlock ?? "latest";
+
+    const [executed, rejected] = await Promise.all([
+      this.publicClient.getContractEvents({
+        address: this.accountAddress,
+        abi: spendAccountAbi,
+        eventName: "SpendExecuted",
+        fromBlock,
+        toBlock,
+      }),
+      this.publicClient.getContractEvents({
+        address: this.accountAddress,
+        abi: spendAccountAbi,
+        eventName: "SpendRejected",
+        fromBlock,
+        toBlock,
+      }),
+    ]);
+
+    const approvedEvents = executed.map((event) => {
+      const args = event.args as {
+        agent?: HexAddress;
+        counterparty?: HexAddress;
+        amount?: bigint;
+        action?: Hex;
+        remainingDailyCap?: bigint;
+      };
+
+      return {
+        id: `${event.transactionHash}-${event.logIndex}`,
+        status: "approved" as const,
+        agent: requireArg(args.agent, "agent"),
+        counterparty: requireArg(args.counterparty, "counterparty"),
+        amountBaseUnits: requireArg(args.amount, "amount"),
+        action: requireArg(args.action, "action"),
+        remainingDailyCap: requireArg(args.remainingDailyCap, "remainingDailyCap"),
+        transactionHash: event.transactionHash,
+        blockNumber: event.blockNumber,
+        logIndex: event.logIndex,
+      };
+    });
+
+    const rejectedEvents = rejected.map((event) => {
+      const args = event.args as {
+        agent?: HexAddress;
+        counterparty?: HexAddress;
+        amount?: bigint;
+        action?: Hex;
+        reason?: number;
+      };
+
+      return {
+        id: `${event.transactionHash}-${event.logIndex}`,
+        status: "rejected" as const,
+        agent: requireArg(args.agent, "agent"),
+        counterparty: requireArg(args.counterparty, "counterparty"),
+        amountBaseUnits: requireArg(args.amount, "amount"),
+        action: requireArg(args.action, "action"),
+        reason: decodeRejectionReason(Number(requireArg(args.reason, "reason"))),
+        transactionHash: event.transactionHash,
+        blockNumber: event.blockNumber,
+        logIndex: event.logIndex,
+      };
+    });
+
+    return [...approvedEvents, ...rejectedEvents].sort((a, b) => {
+      if (a.blockNumber === b.blockNumber) return a.logIndex - b.logIndex;
+      return a.blockNumber < b.blockNumber ? -1 : 1;
+    });
+  }
 }
 
 export function createGuardrailsClient(config: GuardrailsClientConfig): GuardrailsClient {
@@ -131,4 +251,11 @@ export function createGuardrailsClient(config: GuardrailsClientConfig): Guardrai
 
 export function actionToBytes32(action: string): `0x${string}` {
   return keccak256(toBytes(action));
+}
+
+function requireArg<T>(value: T | undefined, name: string): T {
+  if (value === undefined) {
+    throw new Error(`Missing event argument: ${name}`);
+  }
+  return value;
 }

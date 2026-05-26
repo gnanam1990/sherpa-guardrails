@@ -9,6 +9,10 @@ export {
 export { decodeRejectionReason, rejectionReasons } from "./reasons.js";
 export type {
   BudgetState,
+  AuditEvent,
+  AuditEventQuery,
+  AuditEventStatus,
+  CounterpartyState,
   GuardrailsClientConfig,
   HexAddress,
   RejectionReason,

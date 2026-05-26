@@ -16,7 +16,7 @@ export type RejectionReason =
 
 export type GuardrailsClientConfig = {
   accountAddress: HexAddress;
-  account: Account;
+  account?: Account;
   rpcUrl?: string;
   chain?: Chain;
 };
@@ -50,4 +50,33 @@ export type BudgetState = {
   remainingDailyCap: bigint;
   paused: boolean;
   revoked: boolean;
+};
+
+export type CounterpartyState = {
+  counterparty: HexAddress;
+  allowed: boolean;
+  cap: bigint;
+  spent: bigint;
+  remaining: bigint;
+};
+
+export type AuditEventStatus = "approved" | "rejected";
+
+export type AuditEvent = {
+  id: string;
+  status: AuditEventStatus;
+  agent: HexAddress;
+  counterparty: HexAddress;
+  amountBaseUnits: bigint;
+  action: Hex;
+  reason?: RejectionReason;
+  remainingDailyCap?: bigint;
+  transactionHash: Hex;
+  blockNumber: bigint;
+  logIndex: number;
+};
+
+export type AuditEventQuery = {
+  fromBlock?: bigint;
+  toBlock?: bigint | "latest";
 };
