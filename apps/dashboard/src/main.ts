@@ -446,7 +446,7 @@ function snapshotFrom(model: DashboardModel): ProductSnapshot {
     (sum, event) => sum + event.amountBaseUnits,
     0n,
   );
-  const runwayCount =
+  const runwayCount: bigint =
     model.budget.perTxCap === 0n
       ? 0n
       : model.budget.remainingDailyCap / model.budget.perTxCap;

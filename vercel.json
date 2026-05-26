@@ -1,6 +1,6 @@
 {
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm --filter sherpa-dashboard build",
+  "buildCommand": "pnpm --filter @sherpa/guardrails build && pnpm --filter sherpa-dashboard build",
   "outputDirectory": "apps/dashboard/dist",
   "framework": "vite"
 }
