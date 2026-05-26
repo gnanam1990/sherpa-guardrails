@@ -62,6 +62,7 @@ docs                Product, threat model, and demo notes
 
 ## Hackathon Checkpoint
 
+- Full PRD: `docs/SHERPA_PRD_v1.md`
 - Product brief: `docs/PRODUCT_BRIEF.md`
 - Wednesday package: `docs/WEDNESDAY_CHECKPOINT.md`
 - Demo script: `docs/DEMO_SCRIPT.md`
