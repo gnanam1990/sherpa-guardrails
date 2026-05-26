@@ -105,6 +105,29 @@ export class GuardrailsClient {
     const reason = decodeRejectionReason(Number(reasonValue));
 
     if (reason !== "NONE") {
+      if (request.recordRejection !== false) {
+        const txHash = await this.walletClient.writeContract({
+          address: this.accountAddress,
+          abi: spendAccountAbi,
+          functionName: "requestSpend",
+          account: this.config.account,
+          chain: this.chain,
+          args: [
+            request.counterparty,
+            amountBaseUnits,
+            actionToBytes32(request.action),
+          ],
+        });
+
+        return {
+          ok: false,
+          reason,
+          txHash,
+          counterparty: request.counterparty,
+          amountBaseUnits,
+        };
+      }
+
       return {
         ok: false,
         reason,

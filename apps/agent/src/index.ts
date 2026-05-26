@@ -48,7 +48,7 @@ async function main() {
   console.log(`  remaining today:  ${formatUsdc(state.remainingDailyCap)} USDC`);
   console.log("");
 
-  for (const input of demoPaymentIntents.slice(0, 2)) {
+  for (const input of demoPaymentIntents) {
     const intent = parsePaymentIntent(input);
 
     const request = {
@@ -58,6 +58,7 @@ async function main() {
           : intent.counterparty,
       amountUsdc: intent.amountUsdc,
       action: intent.action,
+      recordRejection: true,
     };
 
     console.log(`Intent: ${intent.input}`);
@@ -126,6 +127,9 @@ function printSpendResult(result: SpendResult) {
   console.log("  result: REJECTED");
   console.log(`  amount base units: ${result.amountBaseUnits}`);
   console.log(`  reason: ${result.reason}`);
+  if (result.txHash) {
+    console.log(`  rejection tx: ${result.txHash}`);
+  }
 }
 
 function requireAddress(name: string): HexAddress {

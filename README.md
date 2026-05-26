@@ -69,6 +69,7 @@ docs                Product, threat model, and demo notes
 - Wednesday package: `docs/WEDNESDAY_CHECKPOINT.md`
 - Demo script: `docs/DEMO_SCRIPT.md`
 - Agent payment flow: `docs/AGENT_PAYMENT_FLOW.md`
+- Arc testnet runbook: `docs/ARC_TESTNET_RUNBOOK.md`
 - Architecture: `docs/ARCHITECTURE.md`
 - Threat model: `docs/THREAT_MODEL.md`
 - Roadmap: `docs/ROADMAP.md`
@@ -82,8 +83,23 @@ pnpm install
 cp .env.example .env
 pnpm contracts:build
 pnpm contracts:test
+pnpm testnet:status
 pnpm --filter @sherpa/api dev
 ```
+
+## Arc Testnet Commands
+
+```bash
+pnpm wallets:demo
+pnpm testnet:status
+pnpm testnet:deploy
+pnpm testnet:configure
+pnpm testnet:fund
+pnpm testnet:agent
+pnpm testnet:dashboard
+```
+
+Full runbook: `docs/ARC_TESTNET_RUNBOOK.md`.
 
 ## Preview Deploy
 

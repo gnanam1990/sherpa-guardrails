@@ -53,6 +53,7 @@ settlement rule. If the spend violates policy, the USDC transfer cannot happen.
 
 ```bash
 pnpm arc:check
+pnpm testnet:status
 pnpm contracts:test
 pnpm --filter @sherpa/guardrails test
 pnpm --filter sherpa-demo-agent start -- --dry-run
@@ -64,20 +65,14 @@ After Arc deployment:
 ```bash
 SPEND_ACCOUNT_ADDRESS=0x... \
 COUNTERPARTY_ADDRESS=0x... \
-forge script packages/contracts/script/ConfigureDemo.s.sol:ConfigureDemo \
-  --root packages/contracts \
-  --rpc-url arc_testnet \
-  --broadcast
+pnpm testnet:configure
 
 SPEND_ACCOUNT_ADDRESS=0x... \
 DEMO_FUND_AMOUNT_BASE_UNITS=50000000 \
-forge script packages/contracts/script/FundSpendAccount.s.sol:FundSpendAccount \
-  --root packages/contracts \
-  --rpc-url arc_testnet \
-  --broadcast
+pnpm testnet:fund
 
 SPEND_ACCOUNT_ADDRESS=0x... \
 AGENT_PRIVATE_KEY=0x... \
 COUNTERPARTY_ADDRESS=0x... \
-pnpm --filter sherpa-demo-agent start
+pnpm testnet:agent
 ```

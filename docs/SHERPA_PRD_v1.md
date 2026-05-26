@@ -189,6 +189,7 @@ await sherpa.auditEvents({ fromBlock });
 - Pre-check spend with contract read calls.
 - Submit spend requests from agent key.
 - Return typed approval/rejection result.
+- Optionally record rejected attempts on-chain through `SpendRejected`.
 - Read budget state.
 - Read counterparty state.
 - Read approved/rejected audit events.
@@ -380,6 +381,7 @@ Pending:
 - live rejected transaction
 - dashboard connected to deployed account
 - demo recording
+- Arc Testnet proof runbook in `docs/ARC_TESTNET_RUNBOOK.md`
 
 ## 19. Roadmap
 

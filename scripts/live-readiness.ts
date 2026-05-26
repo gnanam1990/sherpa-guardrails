@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { access } from "node:fs/promises";
 import { constants } from "node:fs";
 

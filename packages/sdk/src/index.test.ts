@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  ARC_TESTNET,
   actionToBytes32,
+  arcTestnet,
   decodeRejectionReason,
   formatUsdc,
   parseUsdc,
@@ -21,6 +23,14 @@ describe("USDC helpers", () => {
 
   it("rejects over-precision amounts", () => {
     expect(() => parseUsdc("0.0000001")).toThrow();
+  });
+});
+
+describe("Arc Testnet constants", () => {
+  it("keeps native gas and ERC-20 USDC precision separate", () => {
+    expect(arcTestnet.nativeCurrency.decimals).toBe(18);
+    expect(ARC_TESTNET.nativeCurrencyDecimals).toBe(18);
+    expect(ARC_TESTNET.usdcErc20Decimals).toBe(6);
   });
 });
 

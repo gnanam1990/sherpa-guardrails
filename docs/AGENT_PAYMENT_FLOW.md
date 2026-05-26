@@ -62,4 +62,5 @@ pnpm --filter sherpa-demo-agent start -- --dry-run
 
 The dry run shows the complete agent loop without private keys. The live path
 uses the same parsed intent, then sends the approved spend through the SDK to
-the deployed `SpendAccount`.
+the deployed `SpendAccount`. Rejected live attempts can also be submitted to
+the contract, so `SpendRejected` appears in the on-chain audit trail.

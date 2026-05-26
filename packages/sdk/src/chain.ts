@@ -6,7 +6,7 @@ export const arcTestnet = defineChain({
   nativeCurrency: {
     name: "USDC",
     symbol: "USDC",
-    decimals: 6,
+    decimals: 18,
   },
   rpcUrls: {
     default: {
@@ -26,6 +26,9 @@ export const arcTestnet = defineChain({
 export const ARC_TESTNET = {
   chainId: arcTestnet.id,
   rpcUrl: arcTestnet.rpcUrls.default.http[0],
+  wsUrl: arcTestnet.rpcUrls.default.webSocket?.[0],
   explorerUrl: arcTestnet.blockExplorers.default.url,
   usdcAddress: "0x3600000000000000000000000000000000000000" as const,
+  nativeCurrencyDecimals: arcTestnet.nativeCurrency.decimals,
+  usdcErc20Decimals: 6,
 } as const;

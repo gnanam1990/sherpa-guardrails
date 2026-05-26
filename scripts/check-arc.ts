@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { createPublicClient, formatUnits, getContract, http, isAddress } from "viem";
 import {
   ARC_TESTNET,
@@ -35,6 +36,7 @@ async function main() {
   console.log(`Arc RPC: ${rpcUrl}`);
   console.log(`Chain ID: ${chainId}`);
   console.log(`Latest block: ${blockNumber}`);
+  console.log(`Native gas token: USDC (${ARC_TESTNET.nativeCurrencyDecimals} decimals)`);
 
   if (chainId !== ARC_TESTNET.chainId) {
     throw new Error(`Expected Arc chain ID ${ARC_TESTNET.chainId}, got ${chainId}`);
@@ -57,8 +59,15 @@ async function main() {
       throw new Error(`Invalid address in OPERATOR_ADDRESS/AGENT_ADDRESS: ${addressToCheck}`);
     }
 
+    const nativeBalance = await client.getBalance({ address: addressToCheck });
     const balance = await usdc.read.balanceOf([addressToCheck]);
-    console.log(`Balance ${addressToCheck}: ${formatUnits(balance, decimals)} USDC`);
+    console.log(
+      `Native gas balance ${addressToCheck}: ${formatUnits(
+        nativeBalance,
+        ARC_TESTNET.nativeCurrencyDecimals,
+      )} USDC`,
+    );
+    console.log(`ERC-20 USDC balance ${addressToCheck}: ${formatUnits(balance, decimals)} USDC`);
   } else {
     console.log("No OPERATOR_ADDRESS or AGENT_ADDRESS set; skipped balance check.");
   }

@@ -15,6 +15,12 @@
     "wallets:demo": "tsx scripts/create-demo-wallets.ts",
     "arc:check": "tsx scripts/check-arc.ts",
     "live:ready": "tsx scripts/live-readiness.ts",
+    "testnet:status": "tsx scripts/testnet-status.ts",
+    "testnet:deploy": "forge script packages/contracts/script/DeployArc.s.sol:DeployArc --root packages/contracts --rpc-url arc_testnet --broadcast",
+    "testnet:configure": "forge script packages/contracts/script/ConfigureDemo.s.sol:ConfigureDemo --root packages/contracts --rpc-url arc_testnet --broadcast",
+    "testnet:fund": "forge script packages/contracts/script/FundSpendAccount.s.sol:FundSpendAccount --root packages/contracts --rpc-url arc_testnet --broadcast",
+    "testnet:agent": "pnpm --filter sherpa-demo-agent start",
+    "testnet:dashboard": "pnpm --filter sherpa-dashboard dev",
     "contracts:build": "forge build --root packages/contracts",
     "contracts:test": "forge test --root packages/contracts",
     "contracts:coverage": "forge coverage --root packages/contracts"
@@ -30,6 +36,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.19.25",
+    "dotenv": "^16.4.7",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "vitest": "^4.0.15"

@@ -25,6 +25,7 @@ export type SpendRequest = {
   counterparty: HexAddress;
   amountUsdc: string;
   action: string;
+  recordRejection?: boolean;
 };
 
 export type SpendReceipt = {
@@ -39,6 +40,7 @@ export type SpendRejection = {
   reason: RejectionReason;
   counterparty: HexAddress;
   amountBaseUnits: bigint;
+  txHash?: Hex;
 };
 
 export type SpendResult = SpendReceipt | SpendRejection;

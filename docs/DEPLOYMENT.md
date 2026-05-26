@@ -33,6 +33,12 @@ Check RPC connectivity:
 pnpm arc:check
 ```
 
+Check the full Arc Testnet live-demo status:
+
+```bash
+pnpm testnet:status
+```
+
 Check live deployment readiness:
 
 ```bash
@@ -42,10 +48,7 @@ pnpm live:ready
 Deploy:
 
 ```bash
-forge script packages/contracts/script/DeployArc.s.sol:DeployArc \
-  --root packages/contracts \
-  --rpc-url arc_testnet \
-  --broadcast
+pnpm testnet:deploy
 ```
 
 The script deploys:
@@ -61,12 +64,7 @@ After deployment, fund the `SpendAccount` with Arc testnet USDC and allowlist de
 Configure caps and the demo counterparty:
 
 ```bash
-SPEND_ACCOUNT_ADDRESS=0x... \
-COUNTERPARTY_ADDRESS=0x... \
-forge script packages/contracts/script/ConfigureDemo.s.sol:ConfigureDemo \
-  --root packages/contracts \
-  --rpc-url arc_testnet \
-  --broadcast
+pnpm testnet:configure
 ```
 
 Optional cap overrides are expressed in USDC base units:
@@ -80,30 +78,19 @@ COUNTERPARTY_DAILY_CAP_BASE_UNITS=20000000
 Fund the account for the live demo:
 
 ```bash
-SPEND_ACCOUNT_ADDRESS=0x... \
-DEMO_FUND_AMOUNT_BASE_UNITS=50000000 \
-forge script packages/contracts/script/FundSpendAccount.s.sol:FundSpendAccount \
-  --root packages/contracts \
-  --rpc-url arc_testnet \
-  --broadcast
+pnpm testnet:fund
 ```
 
 Run the live agent:
 
 ```bash
-SPEND_ACCOUNT_ADDRESS=0x... \
-AGENT_PRIVATE_KEY=0x... \
-COUNTERPARTY_ADDRESS=0x... \
-pnpm --filter sherpa-demo-agent start
+pnpm testnet:agent
 ```
 
 Run the live dashboard:
 
 ```bash
-VITE_SPEND_ACCOUNT_ADDRESS=0x... \
-VITE_COUNTERPARTY_ADDRESS=0x... \
-VITE_FROM_BLOCK=44000000 \
-pnpm --filter sherpa-dashboard dev
+pnpm testnet:dashboard
 ```
 
 ## Vercel Dashboard Preview
