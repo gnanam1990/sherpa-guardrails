@@ -91,6 +91,26 @@ h4 {
   padding: 9px 12px;
 }
 
+.status-pill.live {
+  background: #dff0ff;
+  color: #174a73;
+}
+
+.status-pill.error {
+  background: #f8dada;
+  color: #7a1f1f;
+}
+
+.error-note {
+  margin-top: 14px;
+  border: 1px solid #e6b6b6;
+  border-radius: 8px;
+  background: #fff2f2;
+  color: #7a1f1f;
+  padding: 14px 16px;
+  font-size: 14px;
+}
+
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
@@ -273,6 +293,24 @@ h4 {
   background: #f5f1e8;
   padding: 14px;
   line-height: 1.5;
+}
+
+.empty {
+  border-radius: 8px;
+  background: #f5f1e8;
+  color: #655e52;
+  padding: 18px;
+  font-size: 14px;
+}
+
+a {
+  color: #1a635c;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 
 code {
