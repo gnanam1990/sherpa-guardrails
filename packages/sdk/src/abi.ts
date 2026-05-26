@@ -1,0 +1,90 @@
+export const spendAccountAbi = [
+  {
+    type: "function",
+    name: "canAgentSpend",
+    stateMutability: "view",
+    inputs: [
+      { name: "counterparty", type: "address" },
+      { name: "amount", type: "uint256" },
+    ],
+    outputs: [{ name: "", type: "uint8" }],
+  },
+  {
+    type: "function",
+    name: "requestSpend",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "counterparty", type: "address" },
+      { name: "amount", type: "uint256" },
+      { name: "action", type: "bytes32" },
+    ],
+    outputs: [
+      { name: "ok", type: "bool" },
+      { name: "reason", type: "uint8" },
+    ],
+  },
+  {
+    type: "function",
+    name: "perTxCap",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "dailyCap",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "daySpent",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "remainingDailyCap",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "paused",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "bool" }],
+  },
+  {
+    type: "function",
+    name: "revoked",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "bool" }],
+  },
+  {
+    type: "event",
+    name: "SpendExecuted",
+    inputs: [
+      { name: "agent", type: "address", indexed: true },
+      { name: "counterparty", type: "address", indexed: true },
+      { name: "amount", type: "uint256", indexed: false },
+      { name: "action", type: "bytes32", indexed: true },
+      { name: "remainingDailyCap", type: "uint256", indexed: false },
+    ],
+  },
+  {
+    type: "event",
+    name: "SpendRejected",
+    inputs: [
+      { name: "agent", type: "address", indexed: true },
+      { name: "counterparty", type: "address", indexed: true },
+      { name: "amount", type: "uint256", indexed: false },
+      { name: "action", type: "bytes32", indexed: true },
+      { name: "reason", type: "uint8", indexed: false },
+    ],
+  },
+] as const;
